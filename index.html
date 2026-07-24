@@ -2,18 +2,202 @@
 <html lang="fr">
   <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <title>Catalogue des formations</title>
+    <title>Plan Annuel de Formation - IGEN</title>
 
-    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="index.css" />
   </head>
 
   <body>
-    <h1>Nos formations</h1>
+    <!-- ================= NAVBAR ================= -->
 
-    <div id="formations"></div>
+    <nav class="navbar">
+      <div class="container">
+        <a class="navbar-brand" href="#"> 📚 Plan Annuel de Formation </a>
 
-    <script src="./script js/api.js"></script>
-    <script src="./script js/formations.js"></script>
+        <ul class="navbar-nav">
+          <li>
+            <a class="nav-link active" href="#"> Accueil </a>
+          </li>
+
+          <li>
+            <a class="nav-link" href="formations.html"> Catalogue </a>
+          </li>
+
+          <li>
+            <a class="nav-link" href="#"> Calendrier </a>
+          </li>
+
+          <li>
+            <a class="nav-link" href="#"> Actualités </a>
+          </li>
+
+          <li>
+            <a class="nav-link" href="#"> Contact </a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <!-- ================= HERO ================= -->
+
+    <header>
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-7">
+            <h1>Plateforme de Gestion des Formations</h1>
+
+            <p>
+              Bienvenue sur la plateforme officielle du
+              <strong>Plan Annuel de Formation</strong>. Consultez les
+              formations disponibles, recherchez une session, inscrivez-vous en
+              ligne et suivez votre parcours de formation.
+            </p>
+
+            <a href="formations.html" class="btn btn-primary">
+              Consulter le catalogue
+            </a>
+          </div>
+
+          <div class="col-lg-5">
+            <img src="images/formation.svg" alt="Formation" />
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- ================= RECHERCHE ================= -->
+
+    <section class="search-section">
+      <div class="container">
+        <h2>Rechercher une formation</h2>
+
+        <div class="search-box">
+          <input
+            type="text"
+            id="rechercheAccueil"
+            class="form-control"
+            placeholder="Titre, domaine, discipline..."
+          />
+
+          <button class="btn btn-success">🔍 Rechercher</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= STATISTIQUES ================= -->
+
+    <section class="stats">
+      <div class="container">
+        <div class="grid">
+          <div>
+            <h2 id="nbFormations">0</h2>
+
+            <p>Formations</p>
+          </div>
+
+          <div>
+            <h2 id="nbPlaces">0</h2>
+
+            <p>Places disponibles</p>
+          </div>
+
+          <div>
+            <h2 id="nbDomaines">0</h2>
+
+            <p>Domaines</p>
+          </div>
+
+          <div>
+            <h2 id="nbCertifiantes">0</h2>
+
+            <p>Certifiantes</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= FORMATIONS OUVERTES ================= -->
+
+    <section class="formations-section">
+      <div class="container">
+        <div class="section-header">
+          <h2>Formations ouvertes</h2>
+
+          <a href="formations.html" class="btn btn-outline-primary">
+            Voir tout
+          </a>
+        </div>
+
+        <div id="formationsAccueil" class="grid"></div>
+      </div>
+    </section>
+
+    <!-- ================= CALENDRIER ================= -->
+
+    <section class="calendar-section">
+      <div class="container">
+        <h2>Prochaines sessions</h2>
+
+        <div id="calendrierAccueil" class="grid"></div>
+      </div>
+    </section>
+
+    <!-- ================= ACTUALITES ================= -->
+
+    <section class="actualites">
+      <div class="container">
+        <h2>Actualités</h2>
+
+        <div class="grid">
+          <div class="card">
+            <div class="card-body">
+              <h5>Ouverture des inscriptions</h5>
+
+              <p>
+                Les inscriptions aux formations du prochain trimestre sont
+                ouvertes.
+              </p>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-body">
+              <h5>Nouvelles formations</h5>
+
+              <p>Découvrez les nouveaux parcours proposés cette année.</p>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-body">
+              <h5>Certification</h5>
+
+              <p>
+                Plusieurs formations donnent droit à une attestation
+                certifiante.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= FOOTER ================= -->
+
+    <footer>
+      <div class="container">
+        <h5>Inspection Générale de l'Éducation Nationale</h5>
+
+        <p>Plateforme de Gestion du Plan Annuel de Formation</p>
+
+        <small> © 2026 - Tous droits réservés </small>
+      </div>
+    </footer>
+
+    <script src="script js/api.js"></script>
+
+    <script src="script js/accueil.js"></script>
   </body>
 </html>
