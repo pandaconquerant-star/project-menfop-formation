@@ -1,4 +1,60 @@
+# Dépendances
 node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
+
+# Dossiers de build / compilation
 dist/
+build/
+out/
+target/
+*.min.js
+*.bundle.js
+
+# Fichiers de configuration personnels
 code.gs
 .agents
+.env
+.env.local
+.env.*.local
+
+# Fichiers système
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE et éditeurs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+
+# Logs
+logs/
+*.log
+
+# Fichiers temporaires
+tmp/
+temp/
+*.tmp
+
+# OS
+.DS_Store
+.AppleDouble
+.LSOverride
+Thumbs.db
+
+# Fichiers de test / coverage
+coverage/
+.nyc_output/
+
+# Fichiers de debug
+*.debug
+*.trace
