@@ -16,27 +16,35 @@
       <div class="container">
         <a class="navbar-brand" href="#"> 📚 Plan Annuel de Formation </a>
 
-        <ul class="navbar-nav">
-          <li>
-            <a class="nav-link active" href="#"> Accueil </a>
-          </li>
+        <button class="navbar-toggler" id="navbarToggler" aria-label="Menu">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
 
-          <li>
-            <a class="nav-link" href="formations.html"> Catalogue </a>
-          </li>
+        <div class="navbar-collapse" id="navbarCollapse">
+          <ul class="navbar-nav">
+            <li>
+              <a class="nav-link active" href="index.html"> Accueil </a>
+            </li>
 
-          <li>
-            <a class="nav-link" href="#"> Calendrier </a>
-          </li>
+            <li>
+              <a class="nav-link" href="catalogue.html"> Catalogue </a>
+            </li>
 
-          <li>
-            <a class="nav-link" href="#"> Actualités </a>
-          </li>
+            <li>
+              <a class="nav-link" href="calendrier.html"> Calendrier </a>
+            </li>
 
-          <li>
-            <a class="nav-link" href="#"> Contact </a>
-          </li>
-        </ul>
+            <li>
+              <a class="nav-link" href="actualite.html"> Actualités </a>
+            </li>
+
+            <li>
+              <a class="nav-link" href="contact.html"> Contact </a>
+            </li>
+          </ul>
+        </div>
       </div>
     </nav>
 
@@ -196,8 +204,28 @@
       </div>
     </footer>
 
-    <script src="script js/api.js"></script>
+    <script src="js/api.js"></script>
 
-    <script src="script js/accueil.js"></script>
+    <script src="js/accueil.js"></script>
+
+    <script>
+      const toggler = document.getElementById('navbarToggler');
+      const collapse = document.getElementById('navbarCollapse');
+
+      toggler.addEventListener('click', function () {
+        this.classList.toggle('active');
+        collapse.classList.toggle('active');
+      });
+
+      document.addEventListener('click', function (e) {
+        if (
+          !toggler.contains(e.target) &&
+          !collapse.contains(e.target)
+        ) {
+          toggler.classList.remove('active');
+          collapse.classList.remove('active');
+        }
+      });
+    </script>
   </body>
 </html>
