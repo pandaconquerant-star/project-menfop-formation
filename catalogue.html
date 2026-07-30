@@ -1,10 +1,12 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Catalogue des formations</title>
-    <link rel="stylesheet" href="catalogue.css">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Catalogue des formations — IGEN</title>
+    <link rel="stylesheet" href="catalogue.css" />
+    <link rel="preconnect" href="https://script.google.com" />
+    <link rel="dns-prefetch" href="https://script.google.com" />
 </head>
 <body>
 
@@ -14,34 +16,38 @@
       <div class="container">
         <a class="navbar-brand" href="#"> 📚 Plan Annuel de Formation </a>
 
-        <ul class="navbar-nav">
-          <li>
-            <a class="nav-link active" href="index.html"> Accueil </a>
-          </li>
+        <button class="navbar-toggler" id="navbarToggler" aria-label="Menu">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
 
-          <li>
-            <a class="nav-link" href="catalogue.html"> Catalogue </a>
-          </li>
-
-          <li>
-            <a class="nav-link" href="calendrier.html"> Calendrier </a>
-          </li>
-
-          <li>
-            <a class="nav-link" href="actualite.html"> Actualités </a>
-          </li>
-
-          <li>
-            <a class="nav-link" href="contact.html"> Contact </a>
-          </li>
-        </ul>
+        <div class="navbar-collapse" id="navbarCollapse">
+          <ul class="navbar-nav">
+            <li>
+              <a class="nav-link" href="index.html"> Accueil </a>
+            </li>
+            <li>
+              <a class="nav-link active" href="catalogue.html"> Catalogue </a>
+            </li>
+            <li>
+              <a class="nav-link" href="calendrier.html"> Calendrier </a>
+            </li>
+            <li>
+              <a class="nav-link" href="actualite.html"> Actualités </a>
+            </li>
+            <li>
+              <a class="nav-link" href="contact.html"> Contact </a>
+            </li>
+          </ul>
+        </div>
       </div>
     </nav>
 
-    <!-- Main section -->
+    <!-- ================= MAIN ================= -->
 
     <main class="main-section">
-        <!-- hero -->
+
         <div class="hero-container">
             <h3>Catalogue des formations</h3>
             <p>
@@ -52,61 +58,58 @@
 
         <!-- Barre de recherche -->
         <div class="recherche-container">
-            <input type="text" placeholder="Recherche une formation" class="search-bar" id="search-bar">
+            <input type="text" placeholder="Rechercher une formation..." class="search-bar" id="search-bar">
             <button id="search-button" class="search-button">Rechercher</button>
         </div>
 
-        <!-- Recherche par filtre -->
+        <!-- Filtres -->
         <div class="filter-container">
             <h4>Filtres</h4>
             <div class="group">
                 <div class="group1">
                     <div class="form-group">
-                        <label for="">Domaine</label>
+                        <label for="domaine">Domaine</label>
                         <select id="domaine" class="domaine">
                             <option value="tous">Tous</option>
-                            <!-- Le reste via le script catalogue.js -->
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="">Disciplines</label>
+                        <label for="discipline">Discipline</label>
                         <select id="discipline" class="discipline">
                             <option value="toutes">Toutes</option>
-                            <!-- Le reste via le script catalogue.js -->
                         </select>
                     </div>
                 </div>
                 <div class="group2">
                     <div class="form-group">
-                        <label for="">Niveau</label>
+                        <label for="niveau">Niveau</label>
                         <select id="niveau" class="niveau">
                             <option value="tous">Tous</option>
-                            <!-- Le reste via le script catalogue.js -->
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="">Modalités</label>
+                        <label for="modalites">Modalité</label>
                         <select id="modalites" class="modalites">
                             <option value="toutes">Toutes</option>
-                            <!-- Le reste via le script catalogue.js -->
                         </select>
                     </div>
                 </div>
                 <div class="group3">
                     <div class="form-group">
-                        <label for="">Certification</label>
+                        <label for="certification">Certification</label>
                         <select id="certification" class="certification">
                             <option value="tous">Tous</option>
-                            <!-- Le reste via le script catalogue.js -->
+                            <option value="oui">Certifiantes</option>
+                            <option value="non">Non certifiantes</option>
                         </select>
                     </div>
                 </div>
             </div>
         </div>
 
+        <!-- Affichage -->
         <div class="affichage">
             <div class="header">
-                <!-- 3 cartes indiquant le nombre de formations, le nombre d'inscriptions disponibles et les formations certifiantes-->
                 <div class="cards">
                     <div class="card1">
                         <h2 class="nbr-formations" id="formations-number">0</h2>
@@ -114,56 +117,68 @@
                     </div>
                     <div class="card2">
                         <h2 class="nbr-inscriptions" id="inscriptions-number">0</h2>
-                        <p>Inscriptions disponibles</p>
+                        <p>Inscriptions ouvertes</p>
                     </div>
                     <div class="card3">
                         <h2 class="nbr-formations-certifiantes" id="formations-certifiantes-number">0</h2>
-                        <p>Formations Certifiantes</p>
+                        <p>Certifiantes</p>
                     </div>
                 </div>
-                <!-- le trieur pour trier par ordre/decroissant en fonction de la date de création (createdAt) -->
+
                 <div class="trieur">
-                    <label for="Trier">Trier par : </label>
-                    <select name="" id="">
-                        <option value="croissant">Croissant</option>
-                        <option value="Décroissant">Décroissant</option>
+                    <label for="sort-order">Trier par :</label>
+                    <select id="sort-order">
+                        <option value="croissant">Plus ancien</option>
+                        <option value="decroissant">Plus récent</option>
                     </select>
                 </div>
             </div>
 
-            <div class="results">
-
-            </div>
+            <div class="results"></div>
 
             <div class="pagination">
                 <div class="nbr-result">
                     <p>0 formations</p>
                 </div>
-
                 <div class="bar-results">
-                    <button class="Previous">Previous</button>
+                    <button class="Previous">Précédent</button>
                     <p>1/1</p>
-                    <button class="Next">Next</button>
+                    <button class="Next">Suivant</button>
                 </div>
             </div>
         </div>
 
-        
     </main>
 
-    <!-- Footer -->
+    <!-- ================= FOOTER ================= -->
 
     <footer>
       <div class="container">
         <h5>Inspection Générale de l'Éducation Nationale</h5>
-
         <p>Plateforme de Gestion du Plan Annuel de Formation</p>
-
         <small> © 2026 - Tous droits réservés </small>
       </div>
     </footer>
 
-    <script src="js/catalogue.js"></script>
     <script src="js/api.js"></script>
+    <script src="js/formations.js"></script>
+    <script src="js/catalogue.js"></script>
+
+    <script>
+      var toggler = document.getElementById('navbarToggler');
+      var collapse = document.getElementById('navbarCollapse');
+      if (toggler) {
+        toggler.addEventListener('click', function () {
+          this.classList.toggle('active');
+          collapse.classList.toggle('active');
+        });
+        document.addEventListener('click', function (e) {
+          if (!toggler.contains(e.target) && !collapse.contains(e.target)) {
+            toggler.classList.remove('active');
+            collapse.classList.remove('active');
+          }
+        });
+      }
+    </script>
 </body>
 </html>

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" fill="none">
+  <rect width="400" height="300" fill="#e9ecef" rx="12"/>
+  <path d="M200 60 L280 100 L280 180 L200 220 L120 180 L120 100 Z" fill="#4f46e5" opacity="0.8"/>
+  <path d="M200 140 L280 100 L200 60 L120 100 Z" fill="#6366f1" opacity="0.6"/>
+  <rect x="160" y="130" width="80" height="70" rx="6" fill="#fff" opacity="0.3"/>
+  <text x="200" y="175" text-anchor="middle" fill="#fff" font-size="24" font-family="Arial">Formation</text>
+</svg>
