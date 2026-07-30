@@ -4,6 +4,23 @@
 
 document.addEventListener("DOMContentLoaded", init);
 
+function formaterDate(date) {
+  if (!date) return "";
+
+  // Gestion format ISO :
+  // 2026-09-20T00:00:00.000Z
+
+  const datePure = date.substring(0, 10);
+
+  const morceaux = datePure.split("-");
+
+  if (morceaux.length !== 3) {
+    return date;
+  }
+
+  return `${morceaux[2]}/${morceaux[1]}/${morceaux[0]}`;
+}
+
 async function init() {
   await chargerFormations();
 }

@@ -28,10 +28,8 @@
 
 body {
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-
   background: var(--light);
   color: var(--text);
-
   line-height: 1.6;
 }
 
@@ -90,6 +88,49 @@ a {
 
 .nav-link:hover {
   color: #ffc107;
+}
+
+/* Hamburger — caché sur desktop */
+.navbar-toggler {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  background: none;
+  border: 2px solid rgba(255, 255, 255, 0.6);
+  border-radius: 8px;
+  cursor: pointer;
+  gap: 5px;
+}
+
+.navbar-toggler span {
+  display: block;
+  width: 22px;
+  height: 2.5px;
+  background: white;
+  border-radius: 2px;
+  transition: 0.3s;
+}
+
+/* Animation hamburger → croix */
+.navbar-toggler.active span:nth-child(1) {
+  transform: translateY(7.5px) rotate(45deg);
+}
+
+.navbar-toggler.active span:nth-child(2) {
+  opacity: 0;
+}
+
+.navbar-toggler.active span:nth-child(3) {
+  transform: translateY(-7.5px) rotate(-45deg);
+}
+
+/* Collapse wrapper */
+.navbar-collapse {
+  display: flex;
 }
 
 /* ===========================================
@@ -152,17 +193,11 @@ section h2 {
 
 .btn {
   display: inline-block;
-
   padding: 12px 25px;
-
   border-radius: 10px;
-
   font-weight: 600;
-
   cursor: pointer;
-
   border: none;
-
   transition: 0.3s;
 }
 
@@ -206,17 +241,11 @@ section h2 {
 
 .form-control {
   flex: 1;
-
   height: 60px;
-
   padding: 0 20px;
-
   font-size: 1rem;
-
   border-radius: 12px;
-
   border: 2px solid var(--border);
-
   outline: none;
 }
 
@@ -235,17 +264,13 @@ section h2 {
 
 .stats .grid {
   display: grid;
-
   grid-template-columns: repeat(4, 1fr);
-
   text-align: center;
 }
 
 .stats h2 {
   color: white;
-
   font-size: 3rem;
-
   margin-bottom: 5px;
 }
 
@@ -259,9 +284,7 @@ section h2 {
 
 .grid {
   display: grid;
-
   grid-template-columns: repeat(3, 1fr);
-
   gap: 30px;
 }
 
@@ -271,13 +294,9 @@ section h2 {
 
 .card {
   background: white;
-
   border-radius: var(--radius);
-
   box-shadow: var(--shadow);
-
   overflow: hidden;
-
   transition: 0.3s;
 }
 
@@ -291,9 +310,7 @@ section h2 {
 
 .card h5 {
   color: var(--primary);
-
   font-size: 1.2rem;
-
   margin-bottom: 15px;
 }
 
@@ -303,13 +320,9 @@ section h2 {
 
 .formation-card {
   background: white;
-
   border-radius: 15px;
-
   overflow: hidden;
-
   box-shadow: var(--shadow);
-
   transition: 0.3s;
 }
 
@@ -319,9 +332,7 @@ section h2 {
 
 .formation-header {
   background: var(--primary);
-
   color: white;
-
   padding: 20px;
 }
 
@@ -331,7 +342,6 @@ section h2 {
 
 .formation-footer {
   padding: 20px;
-
   border-top: 1px solid #eee;
 }
 
@@ -341,13 +351,9 @@ section h2 {
 
 .badge {
   display: inline-block;
-
   padding: 8px 14px;
-
   border-radius: 20px;
-
   color: white;
-
   font-size: 0.85rem;
 }
 
@@ -385,11 +391,8 @@ section h2 {
 
 .section-header {
   display: flex;
-
   justify-content: space-between;
-
   align-items: center;
-
   margin-bottom: 30px;
 }
 
@@ -399,13 +402,9 @@ section h2 {
 
 footer {
   background: var(--dark);
-
   color: white;
-
   padding: 40px 0;
-
   text-align: center;
-
   margin-top: 50px;
 }
 
@@ -419,44 +418,73 @@ footer h5 {
 
 .loading {
   text-align: center;
-
   padding: 60px;
-
   font-size: 1.2rem;
 }
 
 .error {
   text-align: center;
-
   padding: 40px;
-
   color: #dc3545;
 }
 
 /* ===========================================
    RESPONSIVE
-=========================================== */
+   ===========================================
+   Breakpoints (appareils ciblés) :
+   - ≤ 1200px → Ordinateur (petit écran / notebook)
+   - ≤ 992px  → Tablette en paysage / petit ordinateur
+   - ≤ 768px  → Tablette en portrait
+   - ≤ 576px  → Téléphone / grand téléphone
+   - ≤ 420px  → Petit téléphone
+   =========================================== */
 
+/* Ordinateur (≤ 1200px) — petits écrans, notebooks */
+@media (max-width: 1200px) {
+  .container {
+    width: 95%;
+  }
+}
+
+/* Tablette paysage / petit ordinateur (≤ 992px) */
 @media (max-width: 992px) {
   .row {
     flex-direction: column;
-
     text-align: center;
   }
 
   .navbar .container {
-    flex-direction: column;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 15px;
+  }
 
-    gap: 20px;
+  .navbar-toggler {
+    display: flex;
+  }
+
+  .navbar-collapse {
+    display: none;
+    width: 100%;
+  }
+
+  .navbar-collapse.active {
+    display: flex;
   }
 
   .navbar-nav {
     flex-direction: column;
-
     text-align: center;
+    gap: 12px;
+    width: 100%;
+  }
+
+  header h1 {
+    font-size: 2.5rem;
   }
 }
 
+/* Tablette portrait (≤ 768px) */
 @media (max-width: 768px) {
   header {
     padding: 50px 0;
@@ -464,6 +492,18 @@ footer h5 {
 
   header h1 {
     font-size: 2rem;
+  }
+
+  header p {
+    font-size: 1rem;
+  }
+
+  section {
+    padding: 50px 0;
+  }
+
+  section h2 {
+    font-size: 1.5rem;
   }
 
   .search-box {
@@ -476,11 +516,89 @@ footer h5 {
 
   .stats .grid {
     grid-template-columns: repeat(2, 1fr);
-
-    gap: 30px;
+    gap: 25px;
   }
 
   .stats h2 {
     font-size: 2rem;
+  }
+
+  .section-header {
+    flex-direction: column;
+    text-align: center;
+    gap: 15px;
+  }
+}
+
+/* Téléphone (≤ 576px) */
+@media (max-width: 576px) {
+  header {
+    padding: 35px 0;
+  }
+
+  header h1 {
+    font-size: 1.6rem;
+  }
+
+  .navbar-brand {
+    font-size: 1.1rem;
+  }
+
+  .stats .grid {
+    gap: 20px;
+  }
+
+  .stats h2 {
+    font-size: 1.6rem;
+  }
+
+  .form-control {
+    height: 50px;
+    font-size: 0.9rem;
+  }
+
+  .btn {
+    padding: 10px 18px;
+    font-size: 0.9rem;
+  }
+
+  footer {
+    padding: 30px 15px;
+  }
+}
+
+/* Petit téléphone (≤ 420px) */
+@media (max-width: 420px) {
+  header h1 {
+    font-size: 1.35rem;
+  }
+
+  header p {
+    font-size: 0.9rem;
+  }
+
+  .stats .grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+  }
+
+  .stats h2 {
+    font-size: 1.35rem;
+  }
+
+  .stats p {
+    font-size: 0.9rem;
+  }
+
+  .navbar-nav{
+    justify-content: flex-start;
+  }
+  
+  .navbar-brand {
+    font-size: 0.95rem;
+  }
+
+  .nav-link {
+    font-size: 0.85rem;
   }
 }

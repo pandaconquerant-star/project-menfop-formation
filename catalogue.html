@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catalogue des formations</title>
+    <link rel="stylesheet" href="catalogue.css">
+</head>
+<body>
+
+    <!-- ================= NAVBAR ================= -->
+
+    <nav class="navbar">
+      <div class="container">
+        <a class="navbar-brand" href="#"> 📚 Plan Annuel de Formation </a>
+
+        <ul class="navbar-nav">
+          <li>
+            <a class="nav-link active" href="index.html"> Accueil </a>
+          </li>
+
+          <li>
+            <a class="nav-link" href="catalogue.html"> Catalogue </a>
+          </li>
+
+          <li>
+            <a class="nav-link" href="calendrier.html"> Calendrier </a>
+          </li>
+
+          <li>
+            <a class="nav-link" href="actualite.html"> Actualités </a>
+          </li>
+
+          <li>
+            <a class="nav-link" href="contact.html"> Contact </a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <!-- Main section -->
+
+    <main class="main-section">
+        <!-- hero -->
+        <div class="hero-container">
+            <h3>Catalogue des formations</h3>
+            <p>
+                Consultez toutes les formations disponibles dans le cadre <br>
+                du Plan Annuel de Formation.
+            </p>
+        </div>
+
+        <!-- Barre de recherche -->
+        <div class="recherche-container">
+            <input type="text" placeholder="Recherche une formation" class="search-bar" id="search-bar">
+            <button id="search-button" class="search-button">Rechercher</button>
+        </div>
+
+        <!-- Recherche par filtre -->
+        <div class="filter-container">
+            <h4>Filtres</h4>
+            <div class="group">
+                <div class="group1">
+                    <div class="form-group">
+                        <label for="">Domaine</label>
+                        <select id="domaine" class="domaine">
+                            <option value="tous">Tous</option>
+                            <!-- Le reste via le script catalogue.js -->
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="">Disciplines</label>
+                        <select id="discipline" class="discipline">
+                            <option value="toutes">Toutes</option>
+                            <!-- Le reste via le script catalogue.js -->
+                        </select>
+                    </div>
+                </div>
+                <div class="group2">
+                    <div class="form-group">
+                        <label for="">Niveau</label>
+                        <select id="niveau" class="niveau">
+                            <option value="tous">Tous</option>
+                            <!-- Le reste via le script catalogue.js -->
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="">Modalités</label>
+                        <select id="modalites" class="modalites">
+                            <option value="toutes">Toutes</option>
+                            <!-- Le reste via le script catalogue.js -->
+                        </select>
+                    </div>
+                </div>
+                <div class="group3">
+                    <div class="form-group">
+                        <label for="">Certification</label>
+                        <select id="certification" class="certification">
+                            <option value="tous">Tous</option>
+                            <!-- Le reste via le script catalogue.js -->
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="affichage">
+            <div class="header">
+                <!-- 3 cartes indiquant le nombre de formations, le nombre d'inscriptions disponibles et les formations certifiantes-->
+                <div class="cards">
+                    <div class="card1">
+                        <h2 class="nbr-formations" id="formations-number">0</h2>
+                        <p>Formations</p>
+                    </div>
+                    <div class="card2">
+                        <h2 class="nbr-inscriptions" id="inscriptions-number">0</h2>
+                        <p>Inscriptions disponibles</p>
+                    </div>
+                    <div class="card3">
+                        <h2 class="nbr-formations-certifiantes" id="formations-certifiantes-number">0</h2>
+                        <p>Formations Certifiantes</p>
+                    </div>
+                </div>
+                <!-- le trieur pour trier par ordre/decroissant en fonction de la date de création (createdAt) -->
+                <div class="trieur">
+                    <label for="Trier">Trier par : </label>
+                    <select name="" id="">
+                        <option value="croissant">Croissant</option>
+                        <option value="Décroissant">Décroissant</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="results">
+
+            </div>
+
+            <div class="pagination">
+                <div class="nbr-result">
+                    <p>0 formations</p>
+                </div>
+
+                <div class="bar-results">
+                    <button class="Previous">Previous</button>
+                    <p>1/1</p>
+                    <button class="Next">Next</button>
+                </div>
+            </div>
+        </div>
+
+        
+    </main>
+
+    <!-- Footer -->
+
+    <footer>
+      <div class="container">
+        <h5>Inspection Générale de l'Éducation Nationale</h5>
+
+        <p>Plateforme de Gestion du Plan Annuel de Formation</p>
+
+        <small> © 2026 - Tous droits réservés </small>
+      </div>
+    </footer>
+
+    <script src="js/catalogue.js"></script>
+    <script src="js/api.js"></script>
+</body>
+</html>
