@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Détails de la formation — IGEN</title>
+    <link rel="stylesheet" href="formation-details.css" />
+    <link rel="preconnect" href="https://script.google.com" />
+    <link rel="dns-prefetch" href="https://script.google.com" />
+  </head>
+
+  <body>
+    <nav class="navbar">
+      <div class="container">
+        <a class="navbar-brand" href="#"> 📚 Plan Annuel de Formation </a>
+
+        <button class="navbar-toggler" id="navbarToggler" aria-label="Menu">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+
+        <div class="navbar-collapse" id="navbarCollapse">
+          <ul class="navbar-nav">
+            <li>
+              <a class="nav-link" href="index.html"> Accueil </a>
+            </li>
+            <li>
+              <a class="nav-link" href="catalogue.html"> Catalogue </a>
+            </li>
+            <li>
+              <a class="nav-link" href="calendrier.html"> Calendrier </a>
+            </li>
+            <li>
+              <a class="nav-link" href="actualite.html"> Actualités </a>
+            </li>
+            <li>
+              <a class="nav-link" href="contact.html"> Contact </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <section>
+      <div class="container">
+        <h2>Détails de la formation</h2>
+        <div id="formationDetails">
+          <div class="loading">Chargement des détails...</div>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <div class="container">
+        <h5>Inspection Générale de l'Éducation Nationale</h5>
+        <p>Plateforme de Gestion du Plan Annuel de Formation</p>
+        <small> © 2026 - Tous droits réservés </small>
+      </div>
+    </footer>
+
+    <script src="js/api.js"></script>
+    <script src="js/formations.js"></script>
+    <script src="js/formations-details.js"></script>
+
+    <script>
+      var toggler = document.getElementById("navbarToggler");
+      var collapse = document.getElementById("navbarCollapse");
+      if (toggler) {
+        toggler.addEventListener("click", function () {
+          this.classList.toggle("active");
+          collapse.classList.toggle("active");
+        });
+        document.addEventListener("click", function (e) {
+          if (!toggler.contains(e.target) && !collapse.contains(e.target)) {
+            toggler.classList.remove("active");
+            collapse.classList.remove("active");
+          }
+        });
+      }
+    </script>
+  </body>
+</html>

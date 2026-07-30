@@ -4,6 +4,8 @@ const API_URL = "https://script.google.com/macros/s/AKfycbxcCnq4QKVjWvxFBaJ7yjua
 
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
+const _prefetch = fetch(API_URL + "?action=formations").catch(() => {});
+
 class Api {
 
     static getCacheKey(action, params) {
@@ -16,12 +18,22 @@ class Api {
             if (!raw) return null;
             const entry = JSON.parse(raw);
             if (Date.now() - entry.timestamp > CACHE_TTL) {
-                localStorage.removeItem(key);
-                return null;
+                return entry.data;
             }
             return entry.data;
         } catch {
             return null;
+        }
+    }
+
+    static isExpired(key) {
+        try {
+            const raw = localStorage.getItem(key);
+            if (!raw) return true;
+            const entry = JSON.parse(raw);
+            return Date.now() - entry.timestamp > CACHE_TTL;
+        } catch {
+            return true;
         }
     }
 
@@ -33,47 +45,41 @@ class Api {
         }
     }
 
-    static async request(action, params = {}) {
-
-        const cacheKey = this.getCacheKey(action, params);
-        const cached = this.getFromCache(cacheKey);
-        if (cached) return cached;
-
+    static _fetchAndCache(cacheKey, action, params) {
         const url = new URL(API_URL);
-
         url.searchParams.append("action", action);
-
         Object.keys(params).forEach(key => {
             url.searchParams.append(key, params[key]);
         });
 
-        try {
+        return fetch(url)
+            .then(response => {
+                if (!response.ok) throw new Error("Erreur réseau");
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) this.setCache(cacheKey, data);
+                return data;
+            })
+            .catch(error => {
+                console.error(error);
+                return { success: false, error: error.message };
+            });
+    }
 
-            const response = await fetch(url);
+    static async request(action, params = {}) {
+        const cacheKey = this.getCacheKey(action, params);
+        const cached = this.getFromCache(cacheKey);
+        const expired = this.isExpired(cacheKey);
 
-            if (!response.ok) {
-                throw new Error("Erreur réseau");
-            }
+        if (cached && !expired) return cached;
 
-            const data = await response.json();
-
-            if (data.success) {
-                this.setCache(cacheKey, data);
-            }
-
-            return data;
-
-        } catch (error) {
-
-            console.error(error);
-
-            return {
-                success: false,
-                error: error.message
-            };
-
+        if (cached && expired) {
+            this._fetchAndCache(cacheKey, action, params);
+            return cached;
         }
 
+        return this._fetchAndCache(cacheKey, action, params);
     }
 
     static async getFormations(forceRefresh = false) {

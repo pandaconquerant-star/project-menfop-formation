@@ -1,0 +1,288 @@
+@import url("index.css");
+
+/* ===============================
+   HERO
+   =============================== */
+
+.hero-container {
+  text-align: center;
+  padding: 60px 0 30px;
+}
+
+.hero-container h3 {
+  font-size: 2rem;
+  color: var(--dark);
+  margin-bottom: 15px;
+}
+
+.hero-container p {
+  font-size: 1.1rem;
+  color: var(--text);
+}
+
+/* ===============================
+   RECHERCHE
+   =============================== */
+
+.recherche-container {
+  display: flex;
+  gap: 15px;
+  max-width: 600px;
+  margin: 0 auto 40px;
+}
+
+.search-bar {
+  flex: 1;
+  height: 50px;
+  padding: 0 20px;
+  font-size: 1rem;
+  border-radius: 12px;
+  border: 2px solid var(--border);
+  outline: none;
+}
+
+.search-bar:focus {
+  border-color: var(--primary);
+}
+
+.search-button {
+  padding: 0 25px;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.search-button:hover {
+  background: var(--primary-dark);
+}
+
+/* ===============================
+   FILTRES
+   =============================== */
+
+.filter-container {
+  background: white;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 25px 30px;
+  margin-bottom: 30px;
+}
+
+.filter-container h4 {
+  color: var(--primary);
+  margin-bottom: 20px;
+}
+
+.filter-container .group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.filter-container .group > div {
+  display: flex;
+  gap: 20px;
+  flex: 1;
+  min-width: 250px;
+}
+
+.form-group {
+  flex: 1;
+}
+
+.form-group label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+
+.form-group select {
+  width: 100%;
+  height: 42px;
+  padding: 0 12px;
+  border-radius: 8px;
+  border: 2px solid var(--border);
+  outline: none;
+  font-size: 0.95rem;
+  background: white;
+  cursor: pointer;
+}
+
+.form-group select:focus {
+  border-color: var(--primary);
+}
+
+/* ===============================
+   AFFICHAGE (stats + tri + résultats)
+   =============================== */
+
+.affichage {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.affichage .header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.cards {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.cards > div {
+  background: white;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 20px 30px;
+  text-align: center;
+  min-width: 160px;
+}
+
+.cards h2 {
+  color: var(--primary);
+  font-size: 2rem;
+  margin-bottom: 5px;
+}
+
+.cards p {
+  color: var(--text);
+  font-weight: 500;
+}
+
+.trieur {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-top: 5px;
+}
+
+.trieur label {
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+}
+
+.trieur select {
+  height: 40px;
+  padding: 0 12px;
+  border-radius: 8px;
+  border: 2px solid var(--border);
+  outline: none;
+  font-size: 0.95rem;
+  background: white;
+  cursor: pointer;
+}
+
+.trieur select:focus {
+  border-color: var(--primary);
+}
+
+.results {
+  min-height: 300px;
+}
+
+.results .grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 25px;
+}
+
+/* ===============================
+   PAGINATION
+   =============================== */
+
+.pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 30px;
+  padding: 15px 0;
+}
+
+.nbr-result p {
+  font-weight: 600;
+  color: var(--text);
+}
+
+.bar-results {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.bar-results button {
+  padding: 10px 20px;
+  border: 2px solid var(--primary);
+  background: white;
+  color: var(--primary);
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.bar-results button:hover:not(:disabled) {
+  background: var(--primary);
+  color: white;
+}
+
+.bar-results button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.bar-results p {
+  font-weight: 600;
+  min-width: 40px;
+  text-align: center;
+}
+
+/* ===============================
+   RESPONSIVE
+   =============================== */
+
+@media (max-width: 992px) {
+  .results .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .filter-container .group {
+    flex-direction: column;
+  }
+
+  .affichage .header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .trieur {
+    justify-content: flex-end;
+  }
+}
+
+@media (max-width: 576px) {
+  .results .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .recherche-container {
+    flex-direction: column;
+  }
+
+  .cards {
+    justify-content: center;
+  }
+}
