@@ -150,5 +150,11 @@ function afficherDetailsFormation(container, f) {
             <small>Créée le ${formaterDate(f.created_at)} — Mise à jour le ${formaterDate(f.updated_at)}</small>
         </div>
     </div>
+
+    <div class="inscription-action-bar">
+        <button class="btn btn-primary btn-lg" onclick="ouvrirFormulaireInscription('${f.id}')">
+            S'inscrire à cette formation
+        </button>
+    </div>
   `;
 }

@@ -170,3 +170,268 @@ function doGet(e) {
 function testGetFormations() {
   Logger.log(JSON.stringify(doGetFormations()));
 }
+
+// ============================================================
+//  INSCRIPTIONS
+// ============================================================
+
+// Feuille 2 : inscription — Base des données des inscriptions
+// id_inscription	id_formation	nom	prenom	matricule	fonction	etablissement	circonscription	telephone	email	discipline	niveau_enseignement	statut	created_at	updated_at
+
+var FEUILLE_FORMATIONS = 'formations';
+var FEUILLE_INSCRIPTIONS = 'inscription';
+
+var EN_TETES_INSCRIPTIONS = [
+  'id_inscription', 'id_formation', 'nom', 'prenom', 'matricule',
+  'fonction', 'etablissement', 'circonscription', 'telephone', 'email',
+  'discipline', 'niveau_enseignement', 'statut', 'created_at', 'updated_at'
+];
+
+/**
+ * Crée la feuille "inscription" si elle n'existe pas encore (avec les en-têtes)
+ * puis la retourne. Si elle existe déjà, elle est simplement récupérée.
+ * @return {Sheet} La feuille "inscription"
+ */
+function creerFeuilleInscription() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName(FEUILLE_INSCRIPTIONS);
+
+  // La feuille n'existe pas encore -> on la crée avec les en-têtes
+  if (!sheet) {
+    sheet = ss.insertSheet(FEUILLE_INSCRIPTIONS);
+    sheet.appendRow(EN_TETES_INSCRIPTIONS);
+    sheet.setFrozenRows(1); // ligne d'en-tête toujours visible
+    sheet.getRange(1, 1, 1, EN_TETES_INSCRIPTIONS.length)
+      .setFontWeight('bold')
+      .setBackground('#d9e2f3');
+  }
+
+  // Formate la colonne Téléphone (colonne 9) en texte brut : évite que des numéros
+  // commençant par "+", "=", "-" ou "@" soient interprétés comme des formules
+  // ("Erreur d'analyse de formule") lors de l'écriture ou de la saisie manuelle.
+  sheet.getRange(2, 9, Math.max(sheet.getMaxRows() - 1, 1), 1).setNumberFormat('@');
+
+  return sheet;
+}
+
+/**
+ * Point d'entrée HTTP POST du Web App Google Apps Script.
+ * Reçoit les inscriptions envoyées depuis le formulaire frontend.
+ * Usage : POST ?action=inscription avec les champs du formulaire
+ * (id_formation, nom, prenom, matricule, fonction, etablissement,
+ *  circonscription, telephone, email, discipline, niveau_enseignement)
+ * @param {Object} e - Objet événement Apps Script (e.parameter contient les données)
+ */
+function doPost(e) {
+  try {
+    var params = e && e.parameter ? e.parameter : {};
+    var action = params.action || '';
+
+    if (action === 'inscription') {
+      var result = enregistrerInscription(params);
+
+      // Mode "iframe" : utilisé quand le site est ouvert en local (file://) sans serveur.
+      // Le POST d'un formulaire dans un iframe caché échappe à la politique CORS,
+      // et le résultat est renvoyé à la page parente via postMessage.
+      if (params.format === 'iframe') {
+        return reponseHtml(result);
+      }
+      return reponseJson(result);
+    }
+
+    return reponseJson({ success: false, error: 'Action POST inconnue : ' + action });
+  } catch (error) {
+    Logger.log(error.toString());
+    return reponseJson({ success: false, error: error.toString() });
+  }
+}
+
+/**
+ * Enregistre une inscription dans la feuille "inscription".
+ * Validation : champs obligatoires, doublon (matricule + formation), capacité max.
+ * @param {Object} data - Données du formulaire (clés = noms des colonnes)
+ * @return {Object} { success: true, id_inscription, message } ou { success: false, error }
+ */
+function enregistrerInscription(data) {
+  // 1) Vérifie que les champs obligatoires sont présents
+  var champsRequis = ['id_formation', 'nom', 'prenom', 'matricule', 'telephone', 'email'];
+  var manquants = [];
+  for (var i = 0; i < champsRequis.length; i++) {
+    var valeur = data[champsRequis[i]];
+    if (valeur === undefined || valeur === null || String(valeur).trim() === '') {
+      manquants.push(champsRequis[i]);
+    }
+  }
+  if (manquants.length > 0) {
+    return { success: false, error: 'Champs obligatoires manquants : ' + manquants.join(', ') };
+  }
+
+  var sheet = creerFeuilleInscription();
+  var idFormation = data.id_formation;
+
+  // 2) Vérifie que la formation existe et n'est pas pleine
+  var capacite = getCapaciteFormation(idFormation);
+  if (capacite !== null) {
+    if (compterInscriptions(idFormation) >= capacite) {
+      return { success: false, error: 'La formation est complète (capacité maximale atteinte).' };
+    }
+  }
+
+  // 3) Empêche l'inscription en double (même matricule + même formation)
+  if (verifierDoublon(sheet, data.matricule, idFormation)) {
+    return { success: false, error: 'Vous êtes déjà inscrit(e) à cette formation.' };
+  }
+
+  // 4) Génère l'id auto-incrémenté
+  var id = prochainIdInscription(sheet);
+
+  // 5) Écrit la ligne dans la feuille
+  var maintenant = formaterHorodatage(new Date());
+  var ligne = sheet.getRange(sheet.getLastRow() + 1, 1, 1, EN_TETES_INSCRIPTIONS.length);
+  ligne.setNumberFormat('@'); // force le texte brut -> aucune interprétation de formule
+  ligne.setValues([[
+    id,
+    idFormation,
+    String(data.nom || '').trim(),
+    String(data.prenom || '').trim(),
+    String(data.matricule || '').trim(),
+    data.fonction || '',
+    data.etablissement || '',
+    data.circonscription || '',
+    data.telephone || '',
+    data.email || '',
+    data.discipline || '',
+    data.niveau_enseignement || '',
+    'En attente',
+    maintenant,
+    maintenant
+  ]]);
+
+  return {
+    success: true,
+    id_inscription: id,
+    message: 'Inscription enregistrée avec succès.'
+  };
+}
+
+/**
+ * Retourne la capacité maximale d'une formation (colonne "capacite_max"),
+ * ou null si la formation n'est pas trouvée / la valeur est absente.
+ */
+function getCapaciteFormation(idFormation) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName(FEUILLE_FORMATIONS);
+  if (!sheet) return null;
+
+  var data = sheet.getDataRange().getValues();
+  for (var i = 1; i < data.length; i++) {
+    if (String(data[i][0]) === String(idFormation)) {
+      var cap = parseInt(data[i][15], 10); // colonne 16 = capacite_max
+      return isNaN(cap) ? null : cap;
+    }
+  }
+  return null;
+}
+
+/**
+ * Compte le nombre d'inscriptions actives pour une formation donnée.
+ */
+function compterInscriptions(idFormation) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName(FEUILLE_INSCRIPTIONS);
+  if (!sheet) return 0;
+
+  var data = sheet.getDataRange().getValues();
+  var nb = 0;
+  for (var i = 1; i < data.length; i++) {
+    // colonne 2 = id_formation, colonne 13 = statut
+    if (String(data[i][1]) === String(idFormation) && String(data[i][12]) !== 'Annulée') {
+      nb++;
+    }
+  }
+  return nb;
+}
+
+/**
+ * Vérifie si un même matricule est déjà inscrit à la même formation.
+ */
+function verifierDoublon(sheet, matricule, idFormation) {
+  var data = sheet.getDataRange().getValues();
+  var mat = String(matricule).trim().toLowerCase();
+
+  for (var i = 1; i < data.length; i++) {
+    var row = data[i];
+    if (!row[0]) continue; // ligne vide
+    if (String(row[4]).trim().toLowerCase() === mat   // matricule (colonne 5)
+        && String(row[1]) === String(idFormation)     // id_formation (colonne 2)
+        && String(row[12]) !== 'Annulée') {           // statut (colonne 13)
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * Calcule le prochain id d'inscription (max + 1) pour un auto-incrément simple.
+ */
+function prochainIdInscription(sheet) {
+  var data = sheet.getDataRange().getValues();
+  var maxId = 0;
+  for (var i = 1; i < data.length; i++) {
+    if (data[i][0]) {
+      var id = parseInt(data[i][0], 10);
+      if (!isNaN(id) && id > maxId) maxId = id;
+    }
+  }
+  return maxId + 1;
+}
+
+/**
+ * Formate une date au format "AAAA-MM-JJ HH:MM:SS" (cohérent avec created_at/updated_at).
+ */
+function formaterHorodatage(date) {
+  function pad(n) { return n < 10 ? '0' + n : '' + n; }
+  return date.getFullYear() + '-' + pad(date.getMonth() + 1) + '-' + pad(date.getDate())
+    + ' ' + pad(date.getHours()) + ':' + pad(date.getMinutes()) + ':' + pad(date.getSeconds());
+}
+
+/**
+ * Retourne une réponse JSON propre pour le Web App.
+ */
+function reponseJson(obj) {
+  return ContentService.createTextOutput(JSON.stringify(obj))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+/**
+ * Retourne une réponse HTML légère qui renvoie le résultat JSON à la page parente
+ * via postMessage (utilisé par le mode "format=iframe", sans serveur local).
+ */
+function reponseHtml(result) {
+  var json = JSON.stringify(result);
+  var html = '<!doctype html><html><body>'
+    + '<script>window.parent.postMessage(' + json + ", '*');<\/script>"
+    + '</body></html>';
+  return HtmlService.createHtmlOutput(html)
+    .setTitle('Résultat inscription');
+}
+
+/**
+ * Fonction de test manuelle (menu "Exécuter") :
+ * crée la feuille "inscription" et enregistre une inscription de test.
+ */
+function testInscription() {
+  Logger.log(JSON.stringify(enregistrerInscription({
+    id_formation: '1',
+    nom: 'Test',
+    prenom: 'Utilisateur',
+    matricule: 'MAT-1234',
+    fonction: 'Enseignant',
+    etablissement: 'CFEN',
+    circonscription: 'Centre',
+    telephone: '+235 00 00 00 00',
+    email: 'test@example.com',
+    discipline: 'Mathématiques',
+    niveau_enseignement: 'Secondaire'
+  })));
+}
