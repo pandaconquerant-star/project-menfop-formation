@@ -69,6 +69,146 @@
   font-size: 0.85rem;
 }
 
+.inscription-action-bar {
+  text-align: center;
+  padding: 30px;
+}
+
+.inscription-action-bar .btn-lg {
+  font-size: 1.15rem;
+  padding: 15px 40px;
+}
+
+/* ===========================================
+   MODAL INSCRIPTION
+   =========================================== */
+
+.inscription-overlay {
+  display: none;
+  position: fixed;
+  z-index: 9999;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.55);
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.inscription-overlay.active {
+  display: flex;
+}
+
+.inscription-modal {
+  background: white;
+  border-radius: var(--radius);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  width: 100%;
+  max-width: 700px;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 35px;
+  position: relative;
+  animation: fadeInUp 0.3s ease;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.inscription-close {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  background: none;
+  border: none;
+  font-size: 2rem;
+  cursor: pointer;
+  color: var(--text);
+  line-height: 1;
+}
+
+.inscription-close:hover {
+  color: #dc3545;
+}
+
+.inscription-modal h3 {
+  color: var(--primary);
+  margin-bottom: 25px;
+  font-size: 1.4rem;
+}
+
+.inscription-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  font-weight: 600;
+  color: var(--dark);
+  margin-bottom: 5px;
+  font-size: 0.9rem;
+}
+
+.form-group input,
+.form-group select {
+  padding: 10px 14px;
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color 0.3s;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  border-color: var(--primary);
+}
+
+.inscription-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 25px;
+}
+
+.inscription-message {
+  margin-top: 15px;
+  padding: 12px 16px;
+  border-radius: 10px;
+  font-weight: 500;
+  display: none;
+}
+
+.inscription-message.inscription-success {
+  display: block;
+  background: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.inscription-message.inscription-error {
+  display: block;
+  background: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
 @media (max-width: 768px) {
   .formation-details-grid {
     grid-template-columns: 1fr;
@@ -80,5 +220,13 @@
 
   .formation-details-header h1 {
     font-size: 1.4rem;
+  }
+
+  .inscription-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .inscription-modal {
+    padding: 25px 20px;
   }
 }
