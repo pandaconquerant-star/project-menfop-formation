@@ -465,7 +465,12 @@ footer h5 {
 
   .navbar-collapse {
     display: none;
+    flex-direction: column;
     width: 100%;
+    background: rgba(0, 0, 0, 0.12);
+    border-radius: 10px;
+    padding: 10px 0;
+    margin-top: 5px;
   }
 
   .navbar-collapse.active {
@@ -475,8 +480,18 @@ footer h5 {
   .navbar-nav {
     flex-direction: column;
     text-align: center;
-    gap: 12px;
+    gap: 5px;
     width: 100%;
+  }
+
+  .nav-link {
+    display: block;
+    padding: 12px 15px;
+    border-radius: 8px;
+  }
+
+  .nav-link:hover {
+    background: rgba(255, 255, 255, 0.12);
   }
 
   header h1 {
@@ -600,5 +615,529 @@ footer h5 {
 
   .nav-link {
     font-size: 0.85rem;
+  }
+}
+
+/* ===========================================
+   PAGE D'ACCUEIL (topbar, hero, filtres)
+=========================================== */
+
+.topbar {
+  background: var(--white);
+  border-bottom: 4px solid var(--primary);
+  padding: 18px 4%;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.brand .logo {
+  width: 56px;
+  height: 56px;
+  flex-shrink: 0;
+  border-radius: 14px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  color: var(--white);
+  font-weight: 800;
+  font-size: 1.3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.brand .ministry {
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--secondary);
+  margin-bottom: 2px;
+}
+
+.brand h1 {
+  color: var(--dark);
+  font-size: 1.45rem;
+  line-height: 1.2;
+  margin-bottom: 2px;
+}
+
+.brand .subtitle {
+  font-size: 0.85rem;
+  color: var(--text);
+  margin-bottom: 0;
+}
+
+main {
+  width: 90%;
+  max-width: 1200px;
+  margin: auto;
+}
+
+.hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 30px;
+  flex-wrap: wrap;
+  padding: 60px 0 20px;
+  background: transparent;
+}
+
+.hero > div:first-child {
+  flex: 1 1 480px;
+}
+
+.hero h2 {
+  color: var(--dark);
+  font-size: 2.1rem;
+  margin-bottom: 16px;
+}
+
+.hero p {
+  font-size: 1.05rem;
+  color: var(--text);
+  max-width: 720px;
+  margin-bottom: 0;
+}
+
+.hero-card {
+  flex: 0 0 auto;
+  min-width: 220px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  color: var(--white);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  text-align: center;
+  padding: 28px 24px;
+}
+
+.hero-card span {
+  display: block;
+  font-size: 3rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.hero-card p {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.95rem;
+  margin-top: 8px;
+}
+
+/* ===========================================
+   FILTRES
+=========================================== */
+
+.filters {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  align-items: center;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 18px;
+  margin: 10px 0 30px;
+}
+
+.filters input,
+.filters select {
+  flex: 1 1 240px;
+  min-width: 0;
+  height: 46px;
+  padding: 0 16px;
+  font-size: 0.95rem;
+  font-family: inherit;
+  color: var(--dark);
+  background: var(--light);
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  outline: none;
+  transition: border-color 0.25s;
+}
+
+.filters input:focus,
+.filters select:focus {
+  border-color: var(--primary);
+  background: var(--white);
+}
+
+/* ===========================================
+   AFFICHAGE DES FORMATIONS
+=========================================== */
+
+.training-display {
+  padding: 0 0 60px;
+}
+
+.training-display__toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+
+.training-display__count {
+  font-weight: 700;
+  color: var(--dark);
+  font-size: 1.05rem;
+}
+
+.training-display__pagination {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.pagination-btn {
+  padding: 9px 18px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  font-family: inherit;
+  color: var(--primary);
+  background: var(--white);
+  border: 2px solid var(--primary);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.25s;
+}
+
+.pagination-btn:hover:not(:disabled) {
+  background: var(--primary);
+  color: var(--white);
+}
+
+.pagination-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.pagination-info {
+  font-weight: 700;
+  color: var(--dark);
+  min-width: 60px;
+  text-align: center;
+}
+
+.training-list {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 26px;
+}
+
+.training-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.training-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.12);
+}
+
+.training-card__public {
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  color: var(--white);
+  font-weight: 700;
+  font-size: 0.85rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  padding: 10px 20px;
+}
+
+.training-card__title {
+  color: var(--dark);
+  font-size: 1.25rem;
+  line-height: 1.35;
+  padding: 18px 20px 8px;
+}
+
+.training-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  background: var(--light);
+  border-top: 1px dashed var(--border);
+  border-bottom: 1px dashed var(--border);
+  padding: 12px 20px;
+  font-size: 0.88rem;
+}
+
+.training-card__meta span {
+  color: var(--text);
+}
+
+.training-card__meta strong {
+  color: var(--dark);
+}
+
+.training-card__objectif {
+  padding: 16px 20px;
+  color: var(--text);
+  font-size: 0.95rem;
+  flex: 1;
+}
+
+.training-card__places {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  padding: 0 20px 16px;
+}
+
+.place-card {
+  background: var(--light);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  text-align: center;
+  padding: 14px 8px;
+}
+
+.place-card--full {
+  border-color: #dc3545;
+  background: #fff0f0;
+}
+
+.place-card__value {
+  display: block;
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--primary);
+  line-height: 1.1;
+}
+
+.place-card--full .place-card__value {
+  color: #dc3545;
+}
+
+.place-card__label {
+  display: block;
+  font-size: 0.78rem;
+  color: var(--text);
+  margin-top: 4px;
+}
+
+.training-card__action {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 14px 20px 20px;
+  border-top: 1px solid #eee;
+}
+
+.status-badge {
+  display: inline-block;
+  font-weight: 700;
+  font-size: 0.85rem;
+  padding: 8px 14px;
+  border-radius: 20px;
+}
+
+.status-badge--open {
+  background: #e8f7ee;
+  color: var(--secondary);
+}
+
+.status-badge--full {
+  background: #fdeaea;
+  color: #dc3545;
+}
+
+.btn-inscrire {
+  padding: 11px 26px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  font-family: inherit;
+  color: var(--white);
+  background: var(--secondary);
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.25s;
+}
+
+.btn-inscrire:hover:not(:disabled) {
+  background: #146c43;
+  transform: translateY(-1px);
+}
+
+.btn-inscrire:disabled {
+  background: #adb5bd;
+  cursor: not-allowed;
+}
+
+/* ===========================================
+   RESPONSIVE ACCUEIL
+=========================================== */
+
+@media (max-width: 900px) {
+  .training-list {
+    grid-template-columns: 1fr;
+  }
+
+  .hero {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .hero-card {
+    width: 100%;
+  }
+}
+
+@media (max-width: 576px) {
+  .brand {
+    flex-wrap: wrap;
+  }
+
+  .brand h1 {
+    font-size: 1.15rem;
+  }
+
+  .hero h2 {
+    font-size: 1.6rem;
+  }
+
+  .training-card__places {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ===========================================
+   FORMULAIRE D'INSCRIPTION (MODAL)
+=========================================== */
+
+.inscription-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 100;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.25s, visibility 0.25s;
+}
+
+.inscription-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.inscription-modal {
+  width: 100%;
+  max-width: 680px;
+  max-height: 90vh;
+  overflow-y: auto;
+  background: var(--white);
+  border-radius: var(--radius);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+  padding: 28px;
+  position: relative;
+}
+
+.inscription-close {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  background: none;
+  border: none;
+  font-size: 1.6rem;
+  line-height: 1;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.inscription-modal h3 {
+  color: var(--dark);
+  margin-bottom: 20px;
+}
+
+.inscription-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+}
+
+.inscription-grid .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.inscription-grid .form-group label {
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--dark);
+}
+
+.inscription-grid .form-group input,
+.inscription-grid .form-group select {
+  width: 100%;
+  height: 42px;
+  padding: 0 12px;
+  font-size: 0.9rem;
+  font-family: inherit;
+  color: var(--dark);
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  outline: none;
+}
+
+.inscription-grid .form-group input:focus,
+.inscription-grid .form-group select:focus {
+  border-color: var(--primary);
+}
+
+.inscription-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.inscription-message {
+  margin-top: 14px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  display: none;
+}
+
+.inscription-success {
+  display: block;
+  background: #e8f7ee;
+  color: var(--secondary);
+}
+
+.inscription-error {
+  display: block;
+  background: #fdeaea;
+  color: #dc3545;
+}
+
+@media (max-width: 576px) {
+  .inscription-grid {
+    grid-template-columns: 1fr;
   }
 }
