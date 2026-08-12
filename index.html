@@ -1,235 +1,70 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="fr">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-    <title>Plan Annuel de Formation - IGEN</title>
-
-    <link rel="stylesheet" href="index.css" />
-    <link rel="preconnect" href="https://script.google.com" />
-    <link rel="dns-prefetch" href="https://script.google.com" />
-  </head>
-
-  <body>
-    <!-- ================= NAVBAR ================= -->
-
-    <nav class="navbar">
-      <div class="container">
-        <a class="navbar-brand" href="#"> 📚 Plan Annuel de Formation </a>
-
-        <button class="navbar-toggler" id="navbarToggler" aria-label="Menu">
-          <span></span>
-          <span></span>
-          <span></span>
-        </button>
-
-        <div class="navbar-collapse" id="navbarCollapse">
-          <ul class="navbar-nav">
-            <li>
-              <a class="nav-link active" href="index.html"> Accueil </a>
-            </li>
-
-            <li>
-              <a class="nav-link" href="catalogue.html"> Catalogue </a>
-            </li>
-
-            <li>
-              <a class="nav-link" href="calendrier.html"> Calendrier </a>
-            </li>
-
-            <li>
-              <a class="nav-link" href="actualite.html"> Actualités </a>
-            </li>
-
-            <li>
-              <a class="nav-link" href="contact.html"> Contact </a>
-            </li>
-          </ul>
-        </div>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Formations à la carte - Inspection générale</title>
+  <link rel="stylesheet" href="index.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo">IG</div>
+      <div>
+        <p class="ministry">Ministère de l’Éducation nationale et de la Formation professionnelle</p>
+        <h1>Formations à la carte</h1>
+        <p class="subtitle">Inspection générale de l’Éducation nationale</p>
       </div>
-    </nav>
+    </div>
+  </header>
 
-    <!-- ================= HERO ================= -->
-
-    <header>
-      <div class="container">
-        <div class="row">
-          <div class="col-lg-7">
-            <h1>Plateforme de Gestion des Formations</h1>
-
-            <p>
-              Bienvenue sur la plateforme officielle du
-              <strong>Plan Annuel de Formation</strong>. Consultez les
-              formations disponibles, recherchez une session, inscrivez-vous en
-              ligne et suivez votre parcours de formation.
-            </p>
-
-            <a href="catalogue.html" class="btn btn-primary">
-              Consulter le catalogue
-            </a>
-          </div>
-
-          <div class="col-lg-5">
-            <img src="images/formation.svg" alt="Formation" />
-          </div>
-        </div>
+  <main>
+    <section class="hero">
+      <div>
+        <h2>Catalogue des formations volontaires</h2>
+        <p>
+          Les enseignants, les conseillers pédagogiques, les chefs d’établissement, les surveillants et les CPE peuvent consulter les offres disponibles,
+          vérifier les dates, le nombre de places restantes et s’inscrire directement en ligne.
+        </p>
       </div>
-    </header>
-
-    <!-- ================= RECHERCHE ================= -->
-
-    <section class="search-section">
-      <div class="container">
-        <h2>Rechercher une formation</h2>
-
-        <div class="search-box">
-          <input
-            type="text"
-            id="rechercheAccueil"
-            class="form-control"
-            placeholder="Titre, domaine, discipline..."
-          />
-
-          <button class="btn btn-success">🔍 Rechercher</button>
-        </div>
+      <div class="hero-card">
+        <span id="totalFormations">0</span>
+        <p>formations ouvertes</p>
       </div>
     </section>
 
-    <!-- ================= STATISTIQUES ================= -->
+    <section class="filters">
+      <input id="searchInput" type="search" placeholder="Rechercher une formation…" />
+      <select id="publicFilter">
+        <option value="Tous">Tous les publics</option>
+        <option value="Enseignants">Enseignants</option>
+        <option value="Conseillers pédagogiques">Conseillers pédagogiques</option>
+        <option value="Enseignants et CP">Enseignants et CP</option>
+        <option value="Chefs d’établissement">Chefs d’établissement</option>
+        <option value="Surveillants">Surveillants</option>
+        <option value="CPE">CPE</option>
+        <option value="Personnels d’encadrement">Personnels d’encadrement</option>
+        <option value="Tous personnels éducatifs">Tous personnels éducatifs</option>
+      </select>
+    </section>
 
-    <section class="stats">
-      <div class="container">
-        <div class="grid">
-          <div>
-            <h2 id="nbFormations">0</h2>
-
-            <p>Formations</p>
-          </div>
-
-          <div>
-            <h2 id="nbPlaces">0</h2>
-
-            <p>Places disponibles</p>
-          </div>
-
-          <div>
-            <h2 id="nbDomaines">0</h2>
-
-            <p>Domaines</p>
-          </div>
-
-          <div>
-            <h2 id="nbCertifiantes">0</h2>
-
-            <p>Certifiantes</p>
-          </div>
+    <section id="trainingDisplay" class="training-display">
+      <div class="training-display__toolbar">
+        <span id="trainingCount" class="training-display__count">0 formations</span>
+        <div class="training-display__pagination">
+          <button type="button" id="prevPage" class="pagination-btn" disabled>Précédent</button>
+          <span id="pageInfo" class="pagination-info">1 / 1</span>
+          <button type="button" id="nextPage" class="pagination-btn" disabled>Suivant</button>
         </div>
       </div>
+      <div id="trainingList" class="training-list"></div>
     </section>
+  </main>
 
-    <!-- ================= FORMATIONS OUVERTES ================= -->
+  <footer>
+    <p>© Inspection générale de l’Éducation nationale — Formations à la carte</p>
+  </footer>
 
-    <section class="formations-section">
-      <div class="container">
-        <div class="section-header">
-          <h2>Formations ouvertes</h2>
-
-          <a href="catalogue.html" class="btn btn-outline-primary">
-            Voir tout
-          </a>
-        </div>
-
-        <div id="formationsAccueil" class="grid"></div>
-      </div>
-    </section>
-
-    <!-- ================= CALENDRIER ================= -->
-
-    <section class="calendar-section">
-      <div class="container">
-        <h2>Prochaines sessions</h2>
-
-        <div id="calendrierAccueil" class="grid"></div>
-      </div>
-    </section>
-
-    <!-- ================= ACTUALITES ================= -->
-
-    <section class="actualites">
-      <div class="container">
-        <h2>Actualités</h2>
-
-        <div class="grid">
-          <div class="card">
-            <div class="card-body">
-              <h5>Ouverture des inscriptions</h5>
-
-              <p>
-                Les inscriptions aux formations du prochain trimestre sont
-                ouvertes.
-              </p>
-            </div>
-          </div>
-
-          <div class="card">
-            <div class="card-body">
-              <h5>Nouvelles formations</h5>
-
-              <p>Découvrez les nouveaux parcours proposés cette année.</p>
-            </div>
-          </div>
-
-          <div class="card">
-            <div class="card-body">
-              <h5>Certification</h5>
-
-              <p>
-                Plusieurs formations donnent droit à une attestation
-                certifiante.
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ================= FOOTER ================= -->
-
-    <footer>
-      <div class="container">
-        <h5>Inspection Générale de l'Éducation Nationale</h5>
-
-        <p>Plateforme de Gestion du Plan Annuel de Formation</p>
-
-        <small> © 2026 - Tous droits réservés </small>
-      </div>
-    </footer>
-
-    <script src="js/api.js"></script>
-
-    <script src="js/formations.js"></script>
-
-    <script src="js/accueil.js"></script>
-
-    <script>
-      const toggler = document.getElementById('navbarToggler');
-      const collapse = document.getElementById('navbarCollapse');
-
-      toggler.addEventListener('click', function () {
-        this.classList.toggle('active');
-        collapse.classList.toggle('active');
-      });
-
-      document.addEventListener('click', function (e) {
-        if (
-          !toggler.contains(e.target) &&
-          !collapse.contains(e.target)
-        ) {
-          toggler.classList.remove('active');
-          collapse.classList.remove('active');
-        }
-      });
-    </script>
-  </body>
+  <script src="js/app.js"></script>
+</body>
 </html>
