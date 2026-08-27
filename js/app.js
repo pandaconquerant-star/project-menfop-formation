@@ -8,7 +8,7 @@
 // ============================================
 
 // URL du Web App Google Apps Script (backend) qui renvoie les données
-const API_URL = "https://script.google.com/macros/s/AKfycbxcCnq4QKVjWvxFBaJ7yjuaRZCj3ZVcwTVf424E8Tj4EpiSwMc8FziVorHsTbHV5gVC/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbwxSpazv-0STY_aDualXUZ5Z_h39uep862v_LEl2kDJ/dev";
 
 // MODE D'ENVOI (choix automatique) :
 //  - serveur HTTP activé (http://localhost...) -> fetch classique
@@ -26,7 +26,7 @@ const CACHE_TTL = 5 * 60 * 1000;
 
 // Préchauffage : on lance la requête des formations dès le chargement du script
 // pour gagner du temps à l'ouverture de la page (ignoré en mode local)
-const _prefetch = MODE_LOCAL ? null : fetch(API_URL + "?action=formations").catch(() => {});
+const _prefetch = MODE_LOCAL ? null : fetch(API_URL + "?action=formations&_=" + Date.now(), { cache: "no-store" }).catch(() => {});
 
 // ============================================
 // API — Gestion des appels au backend
@@ -86,8 +86,13 @@ class Api {
     Object.keys(params).forEach((key) => {
       url.searchParams.append(key, params[key]);
     });
+    // Anti-cache : Apps Script ne renvoie pas d'en-tête Cache-Control interdisant
+    // la mise en cache HTTP. Sans ce paramètre, le navigateur peut resservir une
+    // ancienne réponse pour la même URL (ex: compteurs d'inscrits figés), même en
+    // navigation privée et même après avoir vidé le localStorage.
+    url.searchParams.append("_", Date.now());
 
-    return fetch(url)
+    return fetch(url, { cache: "no-store" })
       .then((response) => {
         if (!response.ok) throw new Error("Erreur réseau");
         return response.json();
@@ -136,80 +141,33 @@ class Api {
     return this.request("formation", { id });
   }
 
-  // Envoie une inscription au backend (action = inscription).
-  // Toujours via l'iframe cachée : le POST fetch est bloqué par CORS
-  // depuis un navigateur (le backend Apps Script ne renvoie pas les
-  // en-têtes Access-Control-Allow-Origin), alors que le POST d'un
-  // formulaire dans une iframe n'est pas soumis à CORS.
+  // Envoie une inscription au backend (action = inscription) via fetch POST direct.
+  // Les Web Apps Apps Script renvoient des en-têtes qui autorisent le fetch cross-origin
+  // (comme pour les requêtes GET), donc pas besoin de passer par une iframe cachée.
   static async inscrire(data) {
-    return this._inscrireViaIframe(data);
-  }
+    try {
+      const params = new URLSearchParams(Object.assign({ action: "inscription" }, data));
 
-  // Envoie l'inscription via un formulaire POST dans une iframe cachée.
-  // Le POST d'un formulaire dans une iframe n'est pas soumis à CORS ;
-  // Apps Script renvoie le résultat à la page parente via postMessage.
-  static _inscrireViaIframe(data) {
-    return new Promise((resolve) => {
-      const iframeName = "iframeInscription" + Date.now();
-      const iframe = document.createElement("iframe");
-      iframe.name = iframeName;
-      iframe.id = iframeName;
-      iframe.style.display = "none";
-      document.body.appendChild(iframe);
+      // AbortController : on annule proprement la requête si elle dépasse 25s
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 25000);
 
-      const form = document.createElement("form");
-      form.method = "POST";
-      form.action = API_URL;
-      form.target = iframeName;
-      form.style.display = "none";
-
-      // Le paramètre "format=iframe" indique au backend de répondre
-      // via postMessage (voir doPost dans code.gs)
-      const params = Object.assign({ action: "inscription", format: "iframe" }, data);
-      Object.keys(params).forEach((key) => {
-        const input = document.createElement("input");
-        input.type = "hidden";
-        input.name = key;
-        input.value = params[key];
-        form.appendChild(input);
+      const response = await fetch(API_URL, {
+        method: "POST",
+        body: params,
+        signal: controller.signal,
       });
+      clearTimeout(timeoutId);
 
-      // Nettoie la iframe, le formulaire et les écouteurs une fois terminé
-      const cleanup = () => {
-        clearTimeout(delai);
-        window.removeEventListener("message", onMessage);
-        if (iframe.parentNode) iframe.parentNode.removeChild(iframe);
-        if (form.parentNode) form.parentNode.removeChild(form);
-      };
-
-      // Réception de la réponse envoyée par Apps Script via postMessage.
-      // e.data est une chaîne JSON : on la convertit en objet pour exploiter
-      // result.success / result.error correctement.
-      const onMessage = (e) => {
-        cleanup();
-        let data = e.data;
-        if (typeof data === "string") {
-          try {
-            data = JSON.parse(data);
-          } catch {
-            data = null;
-          }
-        }
-        resolve(data || { success: false, error: "Réponse invalide" });
-      };
-
-      // Garde-fou : si aucune réponse sous 20s, on abandonne.
-      // (En cas de timeout, vérifie que le Web App Apps Script a bien été
-      // redéployé avec la version actuelle de code.gs)
-      const delai = setTimeout(() => {
-        cleanup();
-        resolve({ success: false, error: "Délai dépassé lors de l'envoi. Vérifiez que le Web App Apps Script est bien redéployé avec la dernière version du code.gs." });
-      }, 30000);
-
-      window.addEventListener("message", onMessage);
-      document.body.appendChild(form);
-      form.submit();
-    });
+      if (!response.ok) throw new Error("Erreur réseau (" + response.status + ")");
+      return await response.json();
+    } catch (error) {
+      console.error(error);
+      if (error.name === "AbortError") {
+        return { success: false, error: "Délai dépassé lors de l'envoi. Vérifiez votre connexion et réessayez." };
+      }
+      return { success: false, error: error.message || "Une erreur est survenue lors de l'envoi." };
+    }
   }
 }
 
@@ -344,6 +302,11 @@ async function soumettreInscription(event) {
     msg.className = "inscription-message inscription-success";
     msg.textContent = "Inscription réussie ! Vous recevrez une confirmation par email.";
     document.getElementById("inscriptionForm").reset();
+
+    // Recharge les formations depuis le serveur (en ignorant le cache) pour que
+    // "Inscrits" et "Places restantes" reflètent immédiatement la nouvelle inscription
+    rafraichirApresInscription();
+
     setTimeout(fermerFormulaireInscription, 2500);
   } else {
     // Échec : message rouge avec l'erreur renvoyée par le backend
@@ -354,6 +317,23 @@ async function soumettreInscription(event) {
   // Réactive le bouton
   btn.disabled = false;
   btn.textContent = "S'inscrire";
+}
+
+/**
+ * Recharge les formations depuis le serveur en ignorant le cache (forceRefresh)
+ * puis réapplique les filtres pour mettre à jour les compteurs "Inscrits" /
+ * "Places restantes" affichés à l'écran, juste après une inscription réussie.
+ */
+async function rafraichirApresInscription() {
+  try {
+    const data = await Api.getFormations(true);
+    if (data.success) {
+      formationsGlobales = data.formations;
+      appliquerFiltres();
+    }
+  } catch (e) {
+    console.error(e);
+  }
 }
 
 // ============================================
