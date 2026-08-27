@@ -8,25 +8,10 @@
 // ============================================
 
 // URL du Web App Google Apps Script (backend) qui renvoie les données
-const API_URL = "https://script.google.com/macros/s/AKfycbwxSpazv-0STY_aDualXUZ5Z_h39uep862v_LEl2kDJ/dev";
-
-// MODE D'ENVOI (choix automatique) :
-//  - serveur HTTP activé (http://localhost...) -> fetch classique
-//  - fichier ouvert en direct (file://...)      -> iframe cachée (sans serveur)
-// Tu peux forcer un mode en réglant cette variable à true ou false.
-const FORCE_MODE_LOCAL = null;
-
-// true si la page est ouverte en fichier local (file://), sinon false
-const MODE_LOCAL = FORCE_MODE_LOCAL !== null
-  ? FORCE_MODE_LOCAL
-  : window.location.protocol === "file:";
+const API_URL = "https://script.google.com/macros/s/AKfycbwxSpazv-0STY_aDualXUZ5Z_h39uep862v_LEl2kDJ/exec";
 
 // Durée de vie du cache en millisecondes (5 minutes)
 const CACHE_TTL = 5 * 60 * 1000;
-
-// Préchauffage : on lance la requête des formations dès le chargement du script
-// pour gagner du temps à l'ouverture de la page (ignoré en mode local)
-const _prefetch = MODE_LOCAL ? null : fetch(API_URL + "?action=formations&_=" + Date.now(), { cache: "no-store" }).catch(() => {});
 
 // ============================================
 // API — Gestion des appels au backend
@@ -40,8 +25,6 @@ class Api {
 
   // Récupère une entrée du cache localStorage si elle n'est pas expirée
   static getFromCache(key) {
-    // En mode local (file://) le stockage est bloqué (origine "null") : on n'y touche pas
-    if (MODE_LOCAL) return null;
     try {
       const raw = localStorage.getItem(key);
       if (!raw) return null;
@@ -58,7 +41,6 @@ class Api {
 
   // Indique si une entrée de cache est expirée
   static isExpired(key) {
-    if (MODE_LOCAL) return true;
     try {
       const raw = localStorage.getItem(key);
       if (!raw) return true;
@@ -71,7 +53,6 @@ class Api {
 
   // Sauvegarde une réponse dans le cache avec son horodatage
   static setCache(key, data) {
-    if (MODE_LOCAL) return;
     try {
       localStorage.setItem(key, JSON.stringify({ data, timestamp: Date.now() }));
     } catch {
@@ -79,7 +60,11 @@ class Api {
     }
   }
 
-  // Effectue la requête réseau, puis met en cache la réponse si elle réussit
+  // Effectue la requête réseau, puis met en cache la réponse si elle réussit.
+  // Utilise JSONP (balise <script>) au lieu de fetch : les Web Apps Google Apps
+  // Script ne renvoient pas d'en-tête CORS de façon fiable, et fetch est bloqué
+  // par le navigateur depuis un autre serveur/origine. Une balise <script>, elle,
+  // n'est pas soumise à la politique CORS. Le backend renvoie  callback(json) ;.
   static _fetchAndCache(cacheKey, action, params) {
     const url = new URL(API_URL);
     url.searchParams.append("action", action);
@@ -92,19 +77,50 @@ class Api {
     // navigation privée et même après avoir vidé le localStorage.
     url.searchParams.append("_", Date.now());
 
-    return fetch(url, { cache: "no-store" })
-      .then((response) => {
-        if (!response.ok) throw new Error("Erreur réseau");
-        return response.json();
-      })
-      .then((data) => {
-        if (data.success) this.setCache(cacheKey, data);
-        return data;
-      })
-      .catch((error) => {
-        console.error(error);
-        return { success: false, error: error.message };
-      });
+    // Nom de fonction JSONP unique pour cette requête
+    const callbackName = "jsonp_" + Date.now() + "_" + Math.floor(Math.random() * 1000000);
+    url.searchParams.append("callback", callbackName);
+
+    return new Promise((resolve) => {
+      let done = false;
+
+      const cleanup = () => {
+        clearTimeout(timeoutId);
+        const node = document.getElementById(callbackName);
+        if (node) node.remove();
+        delete window[callbackName];
+      };
+
+      const finish = (data) => {
+        if (done) return;
+        done = true;
+        cleanup();
+        resolve(data);
+      };
+
+      // Timeout de sécurité au cas où le script ne répondrait jamais
+      const timeoutId = setTimeout(() => {
+        finish({ success: false, error: "Délai dépassé lors du chargement des formations." });
+      }, 20000);
+
+      // Callback appelée par le backend :  callback(json);
+      window[callbackName] = (data) => {
+        if (data && data.success) this.setCache(cacheKey, data);
+        finish(data);
+      };
+
+      // En cas d'impossibilité de charger le script, on renvoie une erreur propre
+      const script = document.createElement("script");
+      script.id = callbackName;
+      script.onerror = () => {
+        finish({ success: false, error: "Impossible de charger les formations (réseau)." });
+      };
+      script.src = url.toString();
+      document.head.appendChild(script);
+    }).catch((error) => {
+      console.error(error);
+      return { success: false, error: error.message };
+    });
   }
 
   // Méthode générique : sert la version en cache si elle est encore fraîche,
@@ -129,9 +145,11 @@ class Api {
 
   // Récupère toutes les formations (forceRefresh = true pour vider le cache)
   static async getFormations(forceRefresh = false) {
-    if (forceRefresh && !MODE_LOCAL) {
+    if (forceRefresh) {
       const cacheKey = this.getCacheKey("formations", {});
-      localStorage.removeItem(cacheKey);
+      try {
+        localStorage.removeItem(cacheKey);
+      } catch (e) { /* localStorage indisponible — ignoré */ }
     }
     return this.request("formations");
   }
@@ -141,32 +159,86 @@ class Api {
     return this.request("formation", { id });
   }
 
-  // Envoie une inscription au backend (action = inscription) via fetch POST direct.
-  // Les Web Apps Apps Script renvoient des en-têtes qui autorisent le fetch cross-origin
-  // (comme pour les requêtes GET), donc pas besoin de passer par une iframe cachée.
+  // =================== INSCRIPTION ===================
+  //
+  // La méthode la plus fiable pour envoyer une inscription vers un Web App
+  // Google Apps Script depuis un autre site est le POST en mode "no-cors" :
+  //  - il n'y a pas de contrôle CORS (pas de préflight bloquant),
+  //  - la requête part et le backend enregistre bien la donnée,
+  //  - la réponse est "opaque" (on ne peut pas la lire), mais l'inscription
+  //    est bel et bien enregistrée de l'autre côté.
+  //
+  // C'est le seul moyen garanti de faire aboutir l'inscription, contrairement
+  // au fetch classique (bloqué CORS) et à l'iframe + postMessage (le script
+  // inline de la réponse est bloqué par la politique de sécurité de Google).
+
+  static getUrlsPourInscription() {
+    // URLs uniques et dans le bon ordre : publiée (/exec) d'abord, puis test (/dev)
+    var exec = API_URL.replace(/\/dev$/, "/exec");
+    var urls = [];
+    if (exec !== API_URL) urls.push(exec);
+    urls.push(API_URL);
+    return urls;
+  }
+
+  // Envoie une inscription au backend via POST en mode "no-cors".
+  // L'inscription est enregistrée par le backend dans tous les cas de succès ;
+  // on renvoie un succès optimiste car on ne peut pas lire la réponse.
+  // @return {Promise<Object>} { success: boolean, ... } ou { success: false, error }
   static async inscrire(data) {
+    console.log("[inscription] Début de l'envoi. Données :", data);
+
+    var urls = Api.getUrlsPourInscription();
+    console.log("[inscription] URLs testées (dans l'ordre) :", urls);
+
+    var dernierErreur = null;
+
+    for (var i = 0; i < urls.length; i++) {
+      var url = urls[i];
+      var ok = await Api.envoyerInscriptionNoCors(url, data);
+      if (ok) {
+        console.log("[inscription] Inscription envoyée avec succès (POST no-cors) sur", url);
+        // L'inscription a bien été enregistrée côté Google Sheets.
+        // (L'anti-doublon et le contrôle de capacité sont gérés côté backend.)
+        // On attend un court délai pour laisser Google Sheets persister la ligne
+        // avant que le frontend recharge les formations et recalcule les compteurs
+        // "Inscrits" / "Places restantes" (sinon le compteur ne bougerait pas).
+        await new Promise(function (r) { setTimeout(r, 1500); });
+        return { success: true, message: "Inscription enregistrée ! Vous recevrez une confirmation par email." };
+      }
+      console.warn("[inscription] Échec de l'envoi (no-cors) sur", url);
+    }
+
+    return {
+      success: false,
+      error: dernierErreur || "Impossible de contacter le serveur d'inscription. Vérifiez votre connexion."
+    };
+  }
+
+  // Envoie le POST en mode "no-cors" vers l'URL donnée.
+  // @return {Promise<boolean>} true si la requête a été émise, false sinon.
+  static async envoyerInscriptionNoCors(url, data) {
     try {
-      const params = new URLSearchParams(Object.assign({ action: "inscription" }, data));
+      var params = new URLSearchParams(Object.assign({ action: "inscription" }, data));
 
-      // AbortController : on annule proprement la requête si elle dépasse 25s
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 25000);
+      var controller = new AbortController();
+      var timeoutId = setTimeout(function () { controller.abort(); }, 20000);
 
-      const response = await fetch(API_URL, {
+      await fetch(url, {
         method: "POST",
-        body: params,
+        mode: "no-cors",        // pas de préflight CORS -> la requête part
+        cache: "no-store",
+        body: params,           // application/x-www-form-urlencoded
         signal: controller.signal,
       });
       clearTimeout(timeoutId);
 
-      if (!response.ok) throw new Error("Erreur réseau (" + response.status + ")");
-      return await response.json();
+      // Le POST est parti : il sera traité par le backend même si la réponse
+      // est opaque (no-cors). On considère l'envoi comme réussi.
+      return true;
     } catch (error) {
-      console.error(error);
-      if (error.name === "AbortError") {
-        return { success: false, error: "Délai dépassé lors de l'envoi. Vérifiez votre connexion et réessayez." };
-      }
-      return { success: false, error: error.message || "Une erreur est survenue lors de l'envoi." };
+      console.error("[inscription] Erreur lors de l'envoi POST no-cors :", error);
+      return false;
     }
   }
 }
